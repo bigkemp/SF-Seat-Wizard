@@ -40,7 +40,7 @@ Use the Seat Wizard in your Saleforce's community, by adding to your chosen page
 
 ## Documentation
 
-Lightning Web Components and Apex classes used in Seat Wizard.
+Lightning Web Components used in Seat Wizard.
 
 |**Component**| **Description**| **Comment**|
 | ------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
