@@ -1,0 +1,39 @@
+<template>
+            <div class="row">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <div class="slds-combobox_container">
+                            <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" style="display: block; position: relative;" aria-expanded="false"
+                                aria-haspopup="listbox" role="combobox">
+                                <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"
+                                    role="none">
+                                    <lightning-input type="search" id="combobox-id-16" value={userName}
+                                        onchange={searchHandleKeyChange} onkeydown={searchHandleClick} onclick={searchHandleClick}
+                                        onblur={searchHandleClick} aria-activedescendant="option1" label={title}
+                                        aria-autocomplete="list" aria-controls="listbox-id-12" role="textbox"
+                                        placeholder="Search..."></lightning-input>   
+                                </div>
+                                <!-- Start : Parent Search Result -->
+                                <div if:true={messageResult}>
+                                    No Result Found!
+                                </div>
+                                <template if:true={showSearchedValues}>
+                                    <div class="slds-box" style="height: 130px; overflow-y: auto; z-index: 10; position: absolute; background: white; width: 100%;">
+                                        <ul class="" role="">
+                                            <template for:each={userList} for:item="usrObj">
+                                                <li class="slds-p-around_x-small" style="cursor: pointer;" key={usrObj.Id}
+                                                    onclick={parentHandleAction} data-value={usrObj.Id}
+                                                    data-label={usrObj.Name} data-email={usrObj.Email}>
+                                                    {usrObj.Name}
+                                                </li>
+                                            </template>
+                                        </ul>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+</template>

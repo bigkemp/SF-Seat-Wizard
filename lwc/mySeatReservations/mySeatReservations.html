@@ -1,0 +1,69 @@
+<template>
+    <template if:true={byWeek}>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col">
+                <b>Daily Reservations:</b><br/>
+                <lightning-accordion allow-multiple-sections-open>
+                    <template if:true={hasDayReservations}>
+                        <template for:each={myDaysByWeek} for:item="week">
+                            <div key={week.key} class="slds-m-around_medium"  style="padding: 0px; margin-bottom: 1%; background: hsl(232deg 63% 84% / 20%);">
+                                <lightning-accordion-section class="slds-box" name={week.key} label={week.key}>
+                                    <template for:each={week.value} for:item="seat">
+                                        <div key={seat.id} style="margin-bottom: 0.5rem">
+                                            <c-seat-reservation-card
+                                                my-icon="custom:custom106"
+                                                recid={seat.id} 
+                                                floor={seat.floor} 
+                                                name={seat.name} 
+                                                card-name={seat.cardName} 
+                                                d-date={seat.dDate}
+                                                onrefreshseating={refreshMySeats}>
+                                            </c-seat-reservation-card>
+                                        </div>
+                                    </template>
+                                </lightning-accordion-section>
+                            </div>
+                        </template>
+                    </template>
+                    <template if:false={hasDayReservations}>
+                        No reservations to display
+                    </template>
+                </lightning-accordion>
+            </div>
+            <div class="slds-col">
+                <b>Hourly Reservations:</b><br/>
+                <lightning-accordion allow-multiple-sections-open>
+                    <template if:true={hasTimeReservations}>
+                        <template for:each={myHoursByWeek} for:item="week">
+                            <div key={week.key} class="slds-m-around_medium"  style="padding: 0px; margin-bottom: 1%; background:#add8e64a;">
+                                <lightning-accordion-section class="slds-box" name={week.key} label={week.key}>
+                                    <template for:each={week.value} for:item="seat">
+                                        <div key={seat.id} style="margin-bottom: 0.5rem">
+                                            <c-seat-reservation-card
+                                                my-icon="standard:date_time"
+                                                recid={seat.id} 
+                                                floor={seat.floor} 
+                                                name={seat.name} 
+                                                card-name={seat.cardName} 
+                                                d-date={seat.dDate}
+                                                start-time={seat.startTime}
+                                                end-time={seat.endTime}
+                                                onrefreshseating={refreshMySeats}>
+                                            </c-seat-reservation-card>
+                                        </div>
+                                    </template>
+                                </lightning-accordion-section>
+                            </div>
+                        </template>
+                    </template>
+                    <template if:false={hasTimeReservations}>
+                        No reservations to display
+                    </template>
+                </lightning-accordion>
+            </div>
+        </div>
+    </template>
+    <template if:false={loaded}>
+        <lightning-spinner alternative-text="Loading"></lightning-spinner>
+        </template>
+</template>

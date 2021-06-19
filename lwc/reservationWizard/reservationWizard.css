@@ -1,0 +1,25 @@
+table, td, th {
+    padding:1%;
+    border: 1px solid black;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .zoombtn{
+    width:10%;
+  }
+
+
+  
+  @media screen and (max-width: 600px) {
+    .accordion-desktop {display: none;}
+    .accordion-mobile {display: block;}
+    .slds-size_1-of-5 {width:100%;}
+    .slds-size_4-of-5 {width:100%;}
+    .parentgrid{display:block;}
+    .mybody{width:100%}
+    .zoombtn{width:50%}
+  }

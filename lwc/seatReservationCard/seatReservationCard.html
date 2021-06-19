@@ -1,0 +1,13 @@
+<template>
+    <lightning-card icon-name={myIcon} variant="Narrow" title={cardName}>
+        <lightning-button data-recid={recid} label="Remove" slot="actions" variant="border-filled" onclick={remove}></lightning-button>
+        <div class="slds-p-horizontal_small">
+            <p>Floor: {floor}</p>
+            <p>Seat: {name}</p>
+            <template if:true={startTime}>
+            <p>Hours: {startTime} - {endTime}</p>
+            </template>
+        </div>
+        <p slot="footer"></p>
+    </lightning-card>
+</template>

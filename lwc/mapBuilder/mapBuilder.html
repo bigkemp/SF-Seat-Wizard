@@ -1,0 +1,126 @@
+<template>
+    <div class="slds-grid">
+        <div class="slds-col slds-size_1-of-5 slds-box" style="padding-bottom: 0;">
+            <div class="slds-col slds-size_1-of-1 " style="background:white;">
+                    <button style="width: 100%;" onclick={saveNewSeats} class="slds-button slds-button_brand">Publish</button>
+                <hr/>
+            </div>
+            <div class="slds-col slds-size_1-of-1 buildersidebar"  style="overflow-y: auto;">
+                <ul style="overflow: auto;">
+                    <template for:each={savedDrawings} for:item="coor">
+                        <div key={coor} class="slds-m-around_medium"  style="padding: 0px; margin-bottom: 1%; background: hsl(232deg 63% 84% / 20%);">
+                            <c-map-builder-seat-card
+                                coor={coor}
+                                onupdateseat={updateCurSeat}
+                                onremoveseat={deleteCurSavedDrawing}
+                                onlocateseat={findCurSeat} 
+                                seattypes ={SeatTypes}
+                                seatattributes={Attributes}
+                                seatneighborhood={Neighborhoods}
+                            ></c-map-builder-seat-card>
+                        </div>
+                    </template> 
+                </ul>
+            </div>
+        </div>
+        <div class="slds-col slds-size_4-of-5">
+            <div class="slds-grid slds-wrap">
+                <div class="slds-col slds-size_1-of-1">
+                    <div class="slds-box builderfloorselector" >
+                        <lightning-combobox
+                        label="Floors"
+                        value={maskfloor}
+                        placeholder="Select Floor"
+                        options={floorOptions}
+                        onchange={chooseFloor} ></lightning-combobox>
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-of-1 canvasHolder" style="overflow: auto;">
+                    <template if:true={ChoseFloor}>
+                        <c-drawing-tool-menu onchosetype={handleChangeTool}>
+                            <div style="background-color:slategray;padding:2px;text-align: center; color: white;">Zoom</div>
+                            <div style="padding-top:2px;padding-bottom:2px;">
+                                <lightning-button-icon-stateful size="small" icon-name="utility:add" onclick={zoomIN} alternative-text="Zoom In"  class="slds-m-around_xxx-small"></lightning-button-icon-stateful>
+                                <lightning-button-icon-stateful size="small" icon-name="utility:dash" onclick={zoomOUT} alternative-text="Zoom Out"  class="slds-m-around_xxx-small"></lightning-button-icon-stateful>
+                            </div>
+                            <hr style="margin-top:0;margin-bottom:0;"/>
+                            <div style="background-color:slategray;padding:2px;text-align: center; color: white;">Drawing</div>
+                            <div style="padding-top:2px;padding-bottom:2px;">
+                                <lightning-button-icon-stateful size="small" icon-name="utility:save" onclick={saveDrawing} alternative-text="Save Drawing"  class="slds-m-around_xxx-small"></lightning-button-icon-stateful>
+                                <lightning-button-icon-stateful size="small" icon-name="utility:redo" onclick={clearDrawing} alternative-text="Clear Drawing"  class="slds-m-around_xxx-small"></lightning-button-icon-stateful>
+                            </div>
+                            <hr style="margin-top:0;margin-bottom:0;"/>
+                            <template if:true={editDrawing}>
+                                <div style="background-color:lightseagreen;padding:2px;text-align: center; color: white;">Edit</div>
+                                <div style="padding-top:2px;padding-bottom:2px;">
+                                    <lightning-button-icon-stateful size="small" icon-name="utility:check" onclick={saveEditChanges} alternative-text="Save Edit"  class="slds-m-around_xxx-small"></lightning-button-icon-stateful>
+                                    <lightning-button-icon-stateful size="small" icon-name="utility:close" onclick={cancelEditResize} alternative-text="Cancel Edit" class="slds-m-around_xxx-small"></lightning-button-icon-stateful>
+                                </div>
+                            </template>
+                        </c-drawing-tool-menu>
+                        <c-canvas-artist floor={floor} publishedcoords={publishedCoords} isbuilder={isBuilder} onchoseseat={openeEditSeat}
+                                         oninvokeclear={clearDrawing} oninvokesave={saveDrawing}>
+                        </c-canvas-artist>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+    <template if:false={loaded}>
+        <lightning-spinner alternative-text="Loading"></lightning-spinner>
+    </template>
+    <c-sw-lwc-modal modaltitle={modaltitle} onmodalclose={modalcloseHandler}>
+        <div slot="modalbody">
+            <template if:true={editIsOff}>
+                <lightning-input label="Seat Name" type="text" value={SelectedSeat.Name} onchange={handleSeatNameChange} disabled style="display:inline-block"></lightning-input>
+                <lightning-button-icon icon-name="utility:edit"  alternative-text="edit" title="edit" onclick={handleToggle}></lightning-button-icon>
+                <template if:true={selectedSeatIsPermanent}>
+                    <br/>
+                    <lightning-input label="Seat Owner" type="text" value={SelectedSeat.Owner} disabled style="display:inline-block"></lightning-input>
+                </template>
+            </template>
+            <template if:false={editIsOff}>
+                <lightning-input label="Seat Name" disabled={editIsOff} type="text" value={SelectedSeat.Name} onchange={handleSeatNameChange}></lightning-input>
+                <template if:true={selectedSeatIsPermanent}>
+                    <c-sw-custom-lookup title="Seat Owner" onselected={myLookupHandle} style="padding:0;"></c-sw-custom-lookup >
+                </template>
+            </template>
+            <lightning-combobox
+            label="Seat Type"
+            value={SelectedSeat.Type}
+            placeholder="Select Type"
+            options={SeatTypes}
+            onchange={handleTypeChange}
+            disabled={editIsOff}
+            ></lightning-combobox>
+            <lightning-combobox name="Neighborhood"
+            label="Seat Neighborhood"
+            placeholder="Select a Neighborhood"
+            options={Neighborhoods}
+            value={SelectedSeat.Neighborhood}
+            onchange={handleNeighborhoodChange}
+            disabled={editIsOff}
+            ></lightning-combobox>
+            <lightning-checkbox-group name="Attributes"
+            label="Seat Attributes"
+            options={Attributes}
+            value={SelectedSeat.Attributes}
+            onchange={handleAttributesChange}
+            disabled={editIsOff}
+            ></lightning-checkbox-group>
+            <br/>
+            <template if:false={editIsOff}>
+                <lightning-button  variant="brand" label="Update Drawing" onclick={updateSelectedSeatDrawing} class="slds-m-left_x-small"></lightning-button>
+                *Update Drawing works only for rectangle drawings.
+                <br/><br/>
+                <lightning-button  variant="destructive" label="Delete Seat" onclick={deleteSelectedSeat} class="slds-m-left_x-small"></lightning-button>
+            </template>
+        </div>
+        <div slot="modalfooter">
+                <template if:false={editIsOff}>
+                    <lightning-button  variant="brand" label="Save Changes" onclick={handleSeatEditSave} class="slds-m-left_x-small"></lightning-button>
+                    <lightning-button  variant="brand" label="Cancel" onclick={handleSeatEditCancel} class="slds-m-left_x-small"></lightning-button>
+                </template>
+        </div>
+      </c-sw-lwc-modal>
+</template>

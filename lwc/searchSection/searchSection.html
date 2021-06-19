@@ -1,0 +1,83 @@
+<template>
+    <div class="topnav myspecial">
+        <a href="#none" onclick={openSearch}>Quick Search</a>
+        <a href="#none" onclick={openGeneralSearch}>Search</a>
+        <a href="#none" onclick={openTodaysReservationSearch}>Floor's Reservations</a>
+        <a href="#none" onclick={HierarchyCoWorkers}>Hierarchy Tree</a>
+        <a href="javascript:void(0);" class="icon" onclick={openCloseHamburger}>
+            <i class="fa fa-bars">
+                <lightning-icon icon-name="utility:rows" alternative-text="Approved" title="Approved"></lightning-icon>
+            </i>
+        </a>
+    </div>
+    <c-sw-lwc-modal modaltitle={modalmaintitle} hideclosebutton={hideclosebutton} addscrolls={hideclosebutton}>
+        <div slot="modalbody">
+            <template if:true={lookingForSomeone}>
+                <c-sw-custom-lookup title="Search user" onselected={updateSearchValue} style="padding:0;"></c-sw-custom-lookup >
+            </template>
+            <template if:true={lookingForSomeoneInGeneral}>
+                <c-sw-custom-lookup title="Search user" onselected={updateSearchValue} style="padding:0;"></c-sw-custom-lookup >
+                <br/>
+                <template for:each={foundGeneralResults} for:item="res">
+                    <li key={res.key}><b>Seat Name:</b>{res.key}</li>
+                    <li key={res.key}><b>Days:</b>
+                        <template for:each={res.value} for:item="seat">
+                            <li style="padding-left:5px" key={seat}>
+                                {seat}
+                            </li>
+                        </template>
+                    </li>
+                    <hr key={res.key} style="margin-top:10px;margin-bottom: 10px;margin-left:0;margin-right:0;"/>
+                </template>
+            </template>
+            <template if:true={LookingForAllReservations}>
+                <template for:each={foundAllReservationResults} for:item="res">
+                    <li key={res}><b>Worker: </b>{res.Owner}</li>
+                    <li key={res}><b>Seat: </b>{res.Name}</li>
+                    <li key={res}><b>Find: </b><lightning-button-icon data-coords={res.Coordinates} data-owner={res.Owner} icon-name="utility:search" title="Mark" onclick={MarkSeat}></lightning-button-icon>                    </li>
+                    <hr key={res} style="margin-top:10px;margin-bottom: 10px;margin-left:0;margin-right:0;"/>
+                </template>
+            </template>
+            <template if:true={lookingForHierarchy}>
+            <template for:each={foundGeneralResults} for:item="result">
+                <table key={result}  class="slds-table slds-table_bordered slds-border_left slds-border_right">
+                    <template for:each={result.value} for:item="worker">
+                        <thead key={worker.Name}>
+                            <tr class="slds-line-height_reset">
+                                <th class="" scope="col" key={worker.Name}>
+                                    <div class="slds-truncate" title="Name">{worker.Name}</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody key={worker.Name}>
+                            <template for:each={worker.Reservations} for:item="reservation">
+                                <td style="text-align: center;" key={worker.Name}>
+                                    <div key={worker.Name}><b>Seat</b></div>
+                                    <div key={worker.Name}><b>Floor</b></div>
+                                    <div key={worker.Name}><b>Date</b></div>
+                                </td>
+                                <td key={reservation.Seat}>
+                                    <div key={reservation.Seat}>{reservation.Seat}</div>
+                                    <div key={reservation.Seat}>{reservation.Floor}</div>
+                                    <div key={reservation.Seat}>{reservation.resDate}</div>
+                                </td>
+                            </template>
+                        </tbody>
+                    </template>
+                </table>
+            </template>
+            </template>
+        </div>
+        <div slot="modalfooter">
+            <template if:true={lookingForSomeone}>
+                <lightning-button variant="brand" label="Show Me Where" onclick={startSearching} class="slds-m-left_x-small"></lightning-button>
+            </template>
+            <template if:true={lookingForSomeoneInGeneral}>
+                <lightning-button variant="brand" label="Show Me Where" onclick={startGeneralSearching} class="slds-m-left_x-small"></lightning-button>
+            </template>
+        </div>
+    </c-sw-lwc-modal>
+    <template if:false={loaded}>
+        <lightning-spinner alternative-text="Loading"></lightning-spinner>
+    </template>
+</template>

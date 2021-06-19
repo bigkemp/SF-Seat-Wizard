@@ -1,0 +1,14 @@
+/* .slds-card__header{
+    background-color: aliceblue !important;
+}
+.slds-card__body{
+    background-color: cyan !important;
+}
+.slds-card__footer{
+    background-color: aquamarine !important;
+} */
+
+@media screen and (max-width: 600px) {
+    .slds-size_1-of-8 {display: none;}
+    .slds-size_6-of-8 {width:100%;}
+  }

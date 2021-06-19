@@ -1,0 +1,179 @@
+<template>
+    <div class="slds-grid parentgrid">
+        <div class="slds-col slds-size_1-of-5 slds-box" style="padding: 0px; background: rgba(21, 137, 238, 0.4);">
+            <c-accordion-date-picker
+            ondaychosen={chooseDay}>
+            </c-accordion-date-picker>
+        </div>
+        <div class="slds-col slds-size_4-of-5">
+            <div class="slds-grid slds-grid_vertical">
+                <div class="slds-col slds-size_1-of-1">
+                    <div class="slds-box" style="background:white">
+                        <lightning-combobox
+                        label="Floors"
+                        value={maskfloor}
+                        placeholder="Select Floor"
+                        options={floorOptions}
+                        onchange={chooseFloor} ></lightning-combobox>
+                    </div>
+                </div>
+                <template if:true={selectionReady}>
+                    <div class="slds-col slds-size_1-of-1 slds-box">
+                        <div style="float:left;width:100%">
+                            <c-search-section day={day} floor={floor} ondrawlocation={drawsearchedlocation}></c-search-section>
+                        </div>
+                        <div style="float:right;width:100%">
+                            <button style="width:50%;margin: 0;font-size: xx-large;" onclick={zoomOUT} class="slds-button zoombtn slds-button_outline-brand">-</button>
+                            <button style="width:50%;margin: 0;font-size: xx-large;" onclick={zoomIN} class="slds-button zoombtn slds-button_outline-brand">+</button>
+                        </div>
+                    </div>
+                </template>
+                <div class="slds-col slds-size_1-of-1 mapContainer" style="overflow: auto;cursor: grab;" onmousedown={mouseDownHandler}>
+                    <template if:false={selectionReady}>
+                        <div class="slds-box">
+                            Select floor and day
+                        </div>
+                    </template>
+                    <template if:true={selectionReady}>
+                        <div style="text-align:center;font-size:large;">
+                            {day}
+                        </div>
+                        <c-canvas-artist floor={floor} publishedcoords={publishedCoords} isbuilder={isBuilder} onchoseseat={seatchosen}></c-canvas-artist>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+    <c-sw-lwc-modal modaltitle={modalmaintitle} hideclosebutton={hideclosebutton} addscrolls={hideclosebutton} onmodalclose={resetModalParams}>
+        <div slot="modalbody">
+              <template if:true={currentSeat}>
+                  <div class="slds-grid slds-gutters">
+                      <div class="slds-col">
+                        <table key={result}  class="slds-table slds-table_bordered slds-border_left slds-border_right">
+                            <thead>
+                                <tr class="slds-line-height_reset">
+                                    <th class="" scope="col">
+                                        <div class="slds-truncate" title="Seat Information">Seat Information:</div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><b>Name:</b></td>
+                                    <td>{chosenSeat.Name}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><b>Type:</b></td>
+                                    <td>{chosenSeat.Type}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><b>Neighborhood:</b></td>
+                                    <td>{chosenSeat.NeighborhoodName}</td>
+                                  </tr>
+                                  <tr>
+                                    <td><b>Attributes:</b></td>
+                                    <td>
+                                      <template for:each={chosenSeat.Attributes} for:item="attribute">
+                                          <li key={attribute}>
+                                              {attribute}
+                                          </li>
+                                      </template>
+                                    </td>
+                                  </tr>        
+                            </tbody>
+                        </table>
+                          <hr style="margin-top: 5%; margin-bottom: 5%;"/>
+                          <template if:false={chosenSeat.Occupied}>
+                            <template if:false={isMultiReserv}>
+                                <template if:true={isDay}>
+                                    <b>Reservation Day: </b>{day}
+                                </template>
+                            </template>
+                            <template if:true={isMultiReserv}>
+                                <template if:true={isDay}>
+                                    <b>Reservation Days: </b> 
+                                    <ul>
+                                        <template for:each={MultiReserveDatesValues} for:item="reserved">
+                                           <li key={reserved}>{reserved}</li>
+                                        </template>
+                                    </ul>
+                                </template>
+                                <template if:true={isHourly}>
+                                    <template if:true={seatTimeObj.Taken}>
+                                        <table key={result}  class="slds-table slds-table_bordered slds-border_left slds-border_right">
+                                            <thead>
+                                                <tr class="slds-line-height_reset">
+                                                    <th class="" scope="col">
+                                                        <div class="slds-truncate" title="Occupied Hours">Occupied Hours:</div>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <template for:each={seatTimeObj.Taken} for:item="hoursreserved">
+                                                    <tr key={hoursreserved}>
+                                                        <td><b>{hoursreserved.timeLabel}</b></td>
+                                                        <td>{hoursreserved.userName}</td>
+                                                        <template if:true={hoursreserved.takenByMe}>
+                                                            <td>
+                                                                <lightning-icon icon-name="utility:close" onclick={freeHour} alternative-text="Remove!" variant="error"
+                                                                data-hour={hoursreserved.minutes} style="cursor:pointer;" size="xx-small"></lightning-icon>
+                                                            </td>
+                                                        </template>
+                                                    </tr>   
+                                                </template> 
+                                            </tbody>
+                                        </table>
+                                        <hr style="margin-top: 5%; margin-bottom: 5%;"/>
+                                    </template>
+                                    <b>Reservation Time: </b> 
+                                    <ul>
+                                        <template for:each={MultiReserveDatesValues} for:item="reserved">
+                                            <li key={reserved}>{reserved}</li>
+                                         </template>
+                                    </ul>
+                                </template>
+                            </template>
+                          </template>
+                          <template if:true={chosenSeat.Occupied}>
+                              <b>Occupier: </b>{chosenSeat.Owner}<br/>
+                          </template>
+                      </div>
+                      <div class="slds-col slds-card">
+                        <template if:false={chosenSeat.Occupied}>
+                            <template if:true={isDay}>
+                                <lightning-combobox
+                                variant="label-hidden"
+                                value={selectedReservationTypes}
+                                options={reservationTypes}
+                                onchange={reservationTypesChange} ></lightning-combobox>
+                            </template>
+                            <template if:true={isMultiReserv}>
+                                    <lightning-checkbox-group name="Dates"
+                                    label="Multi Reserve Dates"
+                                    value={MultiReserveDatesValues}
+                                    options={MultiReserveDates}
+                                    onchange={MultiReserveDatesChange}></lightning-checkbox-group>
+                            </template>
+                        </template>
+                      </div>
+                  </div>
+              </template>
+        </div>
+        <div slot="modalfooter">
+          <template if:true={currentSeat}>
+              <template if:false={chosenSeat.Occupied}>
+                  <lightning-button variant="brand" label="Reserve Seat" title="Primary action" onclick={saveSeat} class="slds-m-left_x-small"></lightning-button>
+              </template>
+              <template if:true={chosenSeat.Occupied}>
+                  <template if:true={chosenSeat.mySeat}>
+                      <lightning-button variant="brand" label="Free Seat" title="Primary action" onclick={leaveSeat} class="slds-m-left_x-small"></lightning-button>
+                  </template>
+              </template>
+          </template>
+        </div>
+
+    </c-sw-lwc-modal>
+    <template if:false={loaded}>
+        <lightning-spinner alternative-text="Loading"></lightning-spinner>
+    </template>
+</template>

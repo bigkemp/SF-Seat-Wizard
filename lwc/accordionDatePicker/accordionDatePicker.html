@@ -1,0 +1,23 @@
+<template>
+    <lightning-accordion allow-multiple-sections-open>
+        <template for:each={weeks} for:item="week">
+            <div key={week.key} class="slds-m-around_medium slds-box"  style="padding: 0px; background: rgb(238, 244, 255);">
+                <lightning-accordion-section name={week.key} label={week.key}>
+                    <div class="slds-max-small-buttons--stretch slds-max-small-buttons--stacked slds-truncate" style="width:100%">                        
+                        <template for:each={week.value} for:item="date">
+                            <div key={date.currentDate} style="width:100%">
+                                <button 
+                                    class="dateButton slds-button slds-button_outline-brand"
+                                    style="display: grid; width: 100%;" 
+                                    key={date.currentDate} 
+                                    data-date={date.currentDate} 
+                                    disabled={date.isInactive} 
+                                    onclick={dayPicked} >{date.dayName} </button>
+                            </div>
+                        </template>
+                    </div>
+                </lightning-accordion-section>
+            </div>
+        </template>
+    </lightning-accordion>
+</template>

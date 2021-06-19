@@ -1,0 +1,16 @@
+<template>
+    <div class="mapContainer" style="position:relative;transform-origin: 0% 0% 0px;" >
+        <img class="mymap" usemap="#imagemap" style="-webkit-user-drag: none; -khtml-user-drag: none; -moz-user-drag: none; -o-user-drag: none; user-drag: none;height: unset; max-height: unset;width: unset;max-width: unset;"  src={floor.Map_Image__c}></img>
+        <map name="imagemap">
+            <template if:false={editIsActive}>
+                <template for:each={publishedcoords} for:item="coor">
+                    <area class="test" key={coor.Name} data-seat={coor.Coordinates} data-name={coor.Name} shape="poly" coords={coor.Coordinates} onclick={choseseat} alt="floor" style="cursor: pointer;">
+                </template>
+            </template>
+        </map>
+        <canvas class='myCanvas' style="pointer-events: none; "></canvas>   
+    </div>
+    <template if:false={loaded}>
+        <lightning-spinner alternative-text="Loading"></lightning-spinner>
+    </template>
+</template>

@@ -1,0 +1,60 @@
+<template>
+    <div class="slds-box">
+        <div class="slds-grid slds-wrap" style="overflow:hidden">
+            <div class="slds-col slds-size-1-of-1"  style="padding-bottom: 5%;">
+                <lightning-icon  icon-name="standard:first_non_empty" title="delete" size="small" data-coord={coor.Coord} onclick={deleteSavedDrawing} style="cursor: pointer;float:left;"></lightning-icon>
+                <lightning-icon  icon-name="utility:search" variant="container" title="search" size="small" locate onclick={locate} style="cursor: pointer;float:right;"></lightning-icon>
+            </div>
+            <div class="slds-col slds-size-1-of-1" style="padding: 1%;">
+                <div class="slds-grid slds-grid slds-wrap">
+                    <div class="slds-col slds-size-1-of-1 slds-truncate" style="padding-bottom: 2%;">
+                    <lightning-input  variant="label-hidden" label="Seat Name:" type="text" 
+                         value={coor.Name} onclick={openEditNameModal} placeholder="Enter Seat Name..."></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size-1-of-1">
+                        <p class="slds-item_label slds-text-color_weak slds-truncate" title="Seat Cords:">Cords:</p>
+                        <p class="slds-item_detail slds-truncate" title="">{coor.Coord}</p>
+                    </div>
+                    <div>
+                        <template if:true={coor.hasError}>
+                            <lightning-helptext icon-name="utility:warning" icon-variant="error"
+                                                content={coor.Msg} 
+                                                    class="slds-m-left_xx-small"></lightning-helptext>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <c-sw-lwc-modal modaltitle={modaltitle} onmodalclose={modalcloseHandler}>
+        <div slot="modalbody">
+            <lightning-input label="Seat Name" type="text" onchange={updateTempName} placeholder="Enter Seat Name..."></lightning-input>
+            <lightning-combobox
+            label="Seat Type"
+            placeholder="Select Type"
+            options={seattypes}
+            value={savedValues.newType}
+            onchange={handleTypeChange}
+            ></lightning-combobox>
+            <template if:true={seatIsPermanentType}>
+                <c-sw-custom-lookup title="Seat Owner" onselected={myLookupHandle} style="padding:0;"></c-sw-custom-lookup >
+            </template>
+            <lightning-combobox name="Seat Neighborhood"
+            label="Seat Neighborhood"
+            options={seatneighborhood}
+            placeholder="Select a Neighborhood"
+            value={savedValues.newNeighborhood}
+            onchange={handleNeighborhoodChange}
+            ></lightning-combobox>
+            <lightning-checkbox-group name="Attributes"
+            label="Seat Attributes"
+            options={seatattributes}
+            value={savedValues.newAttributes}
+            onchange={handleAttributesChange}
+            ></lightning-checkbox-group>
+        </div>
+        <div slot="modalfooter">
+            <lightning-button variant="brand" label="Save Seat" onclick={saveNew} class="slds-m-left_x-small"></lightning-button>
+        </div>
+      </c-sw-lwc-modal>
+</template>

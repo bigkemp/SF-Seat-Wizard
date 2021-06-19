@@ -1,0 +1,21 @@
+<template>
+    <lightning-tabset variant="scoped" active-tab-value={activetab}>
+        <lightning-tab data-name="Seat Reservations" default label="Seat Reservations" value="Seat Reservations" onactive={rerenderContent}>
+            <template if:true={isSR}>
+                <c-reservation-wizard></c-reservation-wizard>
+            </template>
+        </lightning-tab>
+        <template if:true={isBuilder}>
+            <lightning-tab data-name="Settings" label="Builder" value="Settings" onactive={rerenderContent}>
+                <template if:true={isSet}>
+                    <c-map-builder></c-map-builder>
+                </template>
+            </lightning-tab>
+        </template>
+        <lightning-tab data-name="My Seat Reservations" label="My Seat Reservations" value="My Seat Reservations" onactive={rerenderContent}>
+            <template if:true={isMySet}>
+                <c-my-seat-reservations by-week=true></c-my-seat-reservations>
+            </template>
+        </lightning-tab>
+    </lightning-tabset>
+</template>
