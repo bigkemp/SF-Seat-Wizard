@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Attributes__c</fullName>
+    <externalId>false</externalId>
+    <label>Attributes</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Electric Standing Desk</fullName>
+                <default>false</default>
+                <label>Electric Standing Desk</label>
+            </value>
+            <value>
+                <fullName>2 Screens</fullName>
+                <default>false</default>
+                <label>2 Screens</label>
+            </value>
+            <value>
+                <fullName>3 Screens</fullName>
+                <default>false</default>
+                <label>3 Screens</label>
+            </value>
+            <value>
+                <fullName>Printer</fullName>
+                <default>false</default>
+                <label>Printer</label>
+            </value>
+            <value>
+                <fullName>Scanner</fullName>
+                <default>false</default>
+                <label>Scanner</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Map_Image__c</fullName>
+    <externalId>false</externalId>
+    <inlineHelpText>Add a URL for the image of the map.
+One option is uploading a static resource file as public and add the link here.</inlineHelpText>
+    <label>Map Image</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Url</type>
+</CustomField>
