@@ -12,7 +12,7 @@ End Users can book a seat for a day, multiple days, hour/s, based on the organiz
 
 ## Getting Started
 
-1. Install our [Package](#Packages) in your Org - Installation Guide. The package is Unmanged, to allow full transperancy.
+1. Install our [Package](#Packages) in your Org. The package is Unmanged, to allow full transperancy.
 
 2. Set up workdays, workhours and other settings in the "Settings" Metadata record under "FloorManager" (Setup -> Custom Metadata Types -> FloorManager -> Settings).
 
@@ -20,13 +20,11 @@ End Users can book a seat for a day, multiple days, hour/s, based on the organiz
 
 4. Create Seats - from App Launcher (9 dots menu), search for "Seat Wizard", click on "Builder" tab, choose a floor from the "Floors" picklist.
 
-5. Go to the App Launcher (9 dots menu), search for "Seat Wizard", click on "Builder" tab, choose a floor from the "Floors" picklist.
+5. Pick a drawing tool using the "Tools" Bar and draw a shape, saving with either Ctrl+S or the save icon under "Drawing" Bar.
 
-6. Pick a drawing tool using the "Tools" Bar and draw a shape, saving with either Ctrl+S or the save icon under "Drawing" Bar.
+6. Set the Seat Name, Type, Attributes and assign to a neighborhood. Save and Publish ("Publish" button). You just created your new Seat/s.
 
-7. Set the Seat Name, Type, Attributes and assign to a neighborhood. Save and Publish ("Publish" button). You just created your new Seat/s.
-
-8. Click the "Seat Reservations" tab, choose a floor and a date. You will be able to see your Seat on the map's image, clickable and ready for use.
+7. Click the "Seat Reservations" tab, choose a floor and a date. You will be able to see your Seat on the map's image, clickable and ready for use.
 
 ## Use Seat Wizard on Community
 
@@ -82,4 +80,4 @@ We included video tutorials for your use to understand how to use our Seat Wizar
 
 ## Kudos
 
--   **Thank you Shay Ozer for providing a helping hand and guidance with creation of this tool.**
+-   **Thank you [Shay Ozer](https://www.linkedin.com/in/shay-ozer-65018b18/) for providing a helping hand and guidance with creation of this tool.**
