@@ -8,9 +8,15 @@ public with sharing class SeatService {
         List<GeneralService.SeatWrapper> coors = new List<GeneralService.SeatWrapper>();
         List<GeneralService.SeatWrapper> emptySeatscoors = new List<GeneralService.SeatWrapper>();
         Boolean foundMe = false;
-        
+        Boolean foundMeAnotherFloor = false;
+        Id userId = UserInfo.getUserId();
+
+        for(Seat_Reservation__c seatRes : [SELECT Id, Reservation_Date__c, Seat__c,User__c,User__r.Name, Week__c FROM Seat_Reservation__c WHERE User__c =:userId AND Reservation_Date__c =: day]){
+            foundMeAnotherFloor=true;
+        }
+
         for (Seat__c coor : [SELECT id, (SELECT Id, Reservation_Date__c, Seat__c,User__c,User__r.Name, Week__c FROM Seat_Reservations__r WHERE Reservation_Date__c =: day),
-                                Width_Label__c, Coordinates__c, Floor__c,CoordinatesCenter__c, Neighborhood__c, Neighborhood__r.Name, Worker__r.Name, Name,Attributes__c,Type__c FROM 
+                                Width_Label__c, Height_Label__c, Coordinates__c, Floor__c,CoordinatesCenter__c, Neighborhood__c, Neighborhood__r.Name, Worker__r.Name, Name,Attributes__c,Type__c FROM 
                                     Seat__c WHERE Floor__c =: floor]) {
             GeneralService.SeatWrapper currentSeat = new GeneralService.SeatWrapper();
             currentSeat.Name = coor.Name;
@@ -22,6 +28,7 @@ public with sharing class SeatService {
                 currentSeat.NeighborhoodName = coor.Neighborhood__r.Name;
             }
             currentSeat.Width = coor.Width_Label__c;
+            currentSeat.Height = coor.Height_Label__c;
             currentSeat.Type = coor.Type__c;
             if(currentSeat.Type =='Non Reservable'){
                 currentSeat.Occupied = true;
@@ -50,7 +57,7 @@ public with sharing class SeatService {
                 coors.add(currentSeat);
             }
         }
-        if(!foundMe && !emptySeatscoors.isEmpty()){
+        if(!foundMe && !emptySeatscoors.isEmpty() && !foundMeAnotherFloor){
             coors.addAll(emptySeatscoors);
         }
         return coors;
@@ -65,7 +72,7 @@ public with sharing class SeatService {
         List<GeneralService.SeatWrapper> coors = new List<GeneralService.SeatWrapper>();
         
         for (Seat__c coor : [SELECT id, (SELECT Id, Reservation_Date__c, Seat__c,User__c,User__r.Name, Week__c FROM Seat_Reservations__r WHERE Reservation_Date__c =: day),
-                                 Coordinates__c, Floor__c,CoordinatesCenter__c, Neighborhood__c, Neighborhood__r.Name, Worker__r.Name, Name FROM 
+                                 Coordinates__c, Floor__c,Width_Label__c, Height_Label__c,CoordinatesCenter__c, Neighborhood__c, Neighborhood__r.Name, Worker__r.Name, Name FROM 
                                     Seat__c WHERE Floor__c =: floor]) {
             GeneralService.SeatWrapper currentSeat = new GeneralService.SeatWrapper();
             currentSeat.Name = coor.Name;
@@ -124,7 +131,7 @@ public with sharing class SeatService {
         }
 
         for (Seat__c coor : [SELECT id, (SELECT Id, Reservation_Date__c, Seat__c,User__c,User__r.Name, Week__c FROM Seat_Reservations__r WHERE Reservation_Date__c IN:availableDates),
-                                 Coordinates__c, Floor__c, Neighborhood__c, Neighborhood__r.Name, Worker__r.Name, Name FROM 
+                                 Coordinates__c, Floor__c, Width_Label__c, Height_Label__c, Neighborhood__c, Neighborhood__r.Name, Worker__r.Name, Name FROM 
                                     Seat__c WHERE Floor__c =: floor AND Coordinates__c =:Cords ]) {
             // SeatWrapper currentSeat = new SeatWrapper();
             // currentSeat.Name = coor.Name;
@@ -154,7 +161,7 @@ public with sharing class SeatService {
     public static List<String> searchWorker(String WorkerId,Date day,Id floor){
         List<Seat__c> foundSeats = new List<Seat__c>();
         for (Seat__c coor : [SELECT id, (SELECT Id, Reservation_Date__c, Seat__c,User__c,User__r.Name, Week__c FROM Seat_Reservations__r WHERE Reservation_Date__c =:day AND User__c =: WorkerId),
-                                 Coordinates__c, Floor__c, Neighborhood__c, Neighborhood__r.Name, Worker__r.Name, Name FROM 
+                                 Coordinates__c, Floor__c, Width_Label__c, Height_Label__c, Neighborhood__c, Neighborhood__r.Name, Worker__r.Name, Name FROM 
                                     Seat__c WHERE Floor__c =: floor]) {
             if(!coor.Seat_Reservations__r.isEmpty()){
                 foundSeats.add(coor);
@@ -178,7 +185,7 @@ public with sharing class SeatService {
         for (Seat__c coor : [SELECT id, (SELECT Id, Reservation_Date__c, Seat__c,User__c,User__r.Name, Week__c 
                                             FROM Seat_Reservations__r 
                                                 WHERE (User__c =: WorkerId) AND (Reservation_Date__c >= TODAY) ),
-                                 Coordinates__c, Floor__c, Neighborhood__c, Neighborhood__r.Name, Worker__r.Name, Name FROM 
+                                 Coordinates__c, Floor__c, Width_Label__c, Height_Label__c, Neighborhood__c, Neighborhood__r.Name, Worker__r.Name, Name FROM 
                                     Seat__c WHERE Floor__c =: floor]) {
             system.debug(coor);
             system.debug(coor.Seat_Reservations__r.isEmpty());
@@ -210,7 +217,7 @@ public with sharing class SeatService {
      */
     public static Boolean TakeSeat(String SeatName,Date day,Id floor){
         Seat__c Seat = [SELECT id, (SELECT Id, Reservation_Date__c, Seat__c, Week__c FROM Seat_Reservations__r WHERE Reservation_Date__c =: day),
-        Coordinates__c, Floor__c, Neighborhood__c, Neighborhood__r.Name, Worker__r.Name, Name FROM 
+        Coordinates__c, Floor__c, Width_Label__c, Height_Label__c, Neighborhood__c, Neighborhood__r.Name, Worker__r.Name, Name FROM 
            Seat__c WHERE Floor__c =: floor AND Name=:SeatName LIMIT 1];
 
         if(Seat.Seat_Reservations__r.isEmpty()){
@@ -239,7 +246,7 @@ public with sharing class SeatService {
             }
             system.debug(searchableDates);
             Seat__c Seat = [SELECT id, (SELECT Id, Reservation_Date__c, Seat__c, Week__c FROM Seat_Reservations__r WHERE Reservation_Date__c IN: searchableDates),
-            Coordinates__c, Floor__c, Neighborhood__c, Neighborhood__r.Name, Worker__r.Name, Name FROM 
+            Coordinates__c, Floor__c, Width_Label__c, Height_Label__c, Neighborhood__c, Neighborhood__r.Name, Worker__r.Name, Name FROM 
                Seat__c WHERE Floor__c =: floor AND Name=:SeatName LIMIT 1];
             List<Seat_Reservation__c> reservations = new List<Seat_Reservation__c>();
             if(Seat.Seat_Reservations__r.isEmpty()){

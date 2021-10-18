@@ -29,6 +29,7 @@ public with sharing class BuilderService {
             seatObj.Coordinates__c = String.join(seat.Coord,',');
             seatObj.CoordinatesCenter__c = getCenterAndWidth(seat.Coord)[0];
             seatObj.Width_Label__c = Decimal.valueOf(getCenterAndWidth(seat.Coord)[1]);
+            seatObj.Height_Label__c = Decimal.valueOf(getCenterAndWidth(seat.Coord)[2]);
             if(seatObj.Name !=null && !String.isBlank(seatObj.Name)){
                 myseats.add(seatObj);
             }else{
@@ -124,6 +125,7 @@ public with sharing class BuilderService {
         List<String> res = new List<String>();
         res.add(valueforX+','+ valueforY);
         res.add(''+(maxX-minX));
+        res.add(''+(maxY-minY));
         return res;
     }
 
@@ -168,6 +170,7 @@ public with sharing class BuilderService {
         seat.Coordinates__c = newCords;
         seat.CoordinatesCenter__c = getCenterAndWidth('['+seat.Coordinates__c+']')[0];
         seat.Width_Label__c = Decimal.valueOf(getCenterAndWidth('['+seat.Coordinates__c+']')[1]);
+        seat.Height_Label__c = Decimal.valueOf(getCenterAndWidth('['+seat.Coordinates__c+']')[2]);
         update seat;
         return 'success';
     }

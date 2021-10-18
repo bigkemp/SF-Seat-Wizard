@@ -31,7 +31,14 @@ public with sharing class reservationWiz {
             } catch (Exception e) { throw new AuraHandledException(e.getMessage());
             } 
         }
-
+        
+        @AuraEnabled
+        public static void updateFloors(Id floor, Decimal newHeight,Decimal newWidth){
+            try { 
+                GeneralService.updateFloor(floor, newHeight, newWidth);
+            } catch (Exception e) { throw new AuraHandledException(e.getMessage());
+            } 
+        }
         /// CANVAS DEFINITION ///
 
         /** 

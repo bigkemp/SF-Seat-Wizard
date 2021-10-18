@@ -161,14 +161,24 @@ public with sharing class GeneralService {
         return attb;
     }
 
+
     /** 
      * mathod name : getFloors
      * description: returns list of map records
      * used by : builder tab, wizard tab
      */
     public static List<Map__c> getFloors(){
-        List<Map__c> maps = [SELECT Name,Map_Image__c FROM Map__c];
+        List<Map__c> maps = [SELECT Name, Height__c, Width__c, Map_Image__c FROM Map__c];
         return maps;
+    }
+
+    /** 
+     * mathod name : updateFloor
+     * description: updateFloor hight and width
+     * used by : builder tab, wizard tab
+     */
+    public static void updateFloor(Id floor, Decimal newHeight,Decimal newWidth){
+        update (new Map__c(Id = floor, Height__c = newHeight, Width__c = newWidth));
     }
 
     /** 
@@ -261,6 +271,8 @@ public with sharing class GeneralService {
         public String CoordinatesCenter;
         @AuraEnabled
         public Decimal Width;
+        @AuraEnabled
+        public Decimal Height;
         @AuraEnabled
         public String Owner;
         @AuraEnabled
