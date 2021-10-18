@@ -59,7 +59,8 @@ We provide an unmanaged package for ease of use:
 
 |**Package Version**| **Url**| **Comment**|
 | ------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| 1.9 | [Link](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t4K000002akMd) | This is the first public package for Seat Wizard available for download.
+| 1.10 | [Link](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t4K000002akfO) | Updated edit mode for seat drawing - sticky and rect Improved UI experience Improved mobile support.
+| 1.9 | [Link](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t4K000002akMd) | Initial Release.
 
 
 ## HowTo
