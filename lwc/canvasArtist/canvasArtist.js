@@ -59,7 +59,7 @@ export default class CanvasArtist extends LightningElement {
 
     @api saveAndEndEditMode(){
         var newCords = Resizer.saveAndEndEditMode();
-        //this.resetToolTypes();
+        this.resetToolTypes();
         return newCords;
     }
 
@@ -88,10 +88,10 @@ export default class CanvasArtist extends LightningElement {
         this.editIsActive = false;
     }
 
-    @api startEdit(targetCoords){
+    @api startEdit(targetCoords,isRedraw){
         this.resetToolTypes();
         this.isResize = true;
-        Resizer.GetContext(this,targetCoords);
+        Resizer.GetContext(this,targetCoords,isRedraw);
     }
 
     @api zoomOut(){
@@ -144,6 +144,21 @@ export default class CanvasArtist extends LightningElement {
         if(this.isbuilder){
             Builder.refreshDrawing(false);
             Builder.drawNewCords();
+            var mCoords = coOrdStr.split(',');
+            var i, n;
+            n = mCoords.length;
+            this.hdc.beginPath();
+            this.hdc.moveTo(mCoords[0], mCoords[1]);
+            for (i=2; i<n; i+=2)
+            {
+                this.hdc.lineTo(mCoords[i], mCoords[i+1]);
+            }
+            this.hdc.lineTo(mCoords[0], mCoords[1]);
+            this.hdc.save();
+            this.hdc.strokeStyle = markerColor;
+            this.hdc.lineWidth = this.hdc.lineWidth*2;
+            this.hdc.stroke();
+            this.hdc.restore();
         }else{
             this.publishedcoords.forEach(coord => {
                 let strokeColor;
@@ -175,25 +190,61 @@ export default class CanvasArtist extends LightningElement {
                     }
                     strokeColor = '#DEB887';
                 }
-                this.drawPoly(coord.Coordinates,strokeColor,true,true,displayName,coord.CoordinatesCenter,coord.Width);
+                if(coord.Coordinates == coOrdStr){
+                    strokeColor = markerColor;
+                    var mCoords;
+                    if(Array.isArray(coord.CoordinatesCenter)){
+                        mCoords = coord.CoordinatesCenter;
+                    }else{
+                        mCoords = coord.CoordinatesCenter.split(',');
+                    }
+                    // console.log('marker mCoords '+ mCoords);
+                    // console.log('marker oord.Height '+ coord.Height);
+                    var markerX = mCoords[0];
+                    var markerY = mCoords[1]-coord.Height/2;
+                    // console.log('markerX '+ markerX);
+                    // console.log('markerY '+ markerX);
+
+                    this.drawMarker(markerX,markerY)
+                }
+                this.drawPoly(coord.Coordinates,strokeColor,true,true,displayName,coord.CoordinatesCenter,coord.Width,coord.Height);
             });
         }
-        var mCoords = coOrdStr.split(',');
-        var i, n;
-        n = mCoords.length;
+    }
+
+    drawMarker(x,y) {
+        
+        var radius = 20;
         this.hdc.beginPath();
-        this.hdc.moveTo(mCoords[0], mCoords[1]);
-        for (i=2; i<n; i+=2)
-        {
-            this.hdc.lineTo(mCoords[i], mCoords[i+1]);
-        }
-        this.hdc.lineTo(mCoords[0], mCoords[1]);
-        this.hdc.strokeStyle = markerColor;
+        //this.hdc.moveTo(75, 40);
+        var startangle  = -Math.PI
+        var endangle  = 0
+        var arccenterY = y - 2*radius/1.414;
+        this.hdc.moveTo(x-radius, arccenterY);
+        this.hdc.arc(x, arccenterY, radius, startangle, endangle, false);
+        // console.log('marker 2.4')
+        this.hdc.lineTo(x, y);
+        this.hdc.lineTo(x-radius, arccenterY);
+        this.hdc.fillStyle = "#FF0000";
+        this.hdc.fill();
+        this.hdc.strokeStyle = "#000000";
         this.hdc.lineWidth = this.hdc.lineWidth*2;
         this.hdc.stroke();
-        this.hdc.lineWidth = this.hdc.lineWidth/2;
-
     }
+            // var mCoords = coOrdStr.split(',');
+        // var i, n;
+        // n = mCoords.length;
+        // this.hdc.beginPath();
+        // this.hdc.moveTo(mCoords[0], mCoords[1]);
+        // for (i=2; i<n; i+=2)
+        // {
+        //     this.hdc.lineTo(mCoords[i], mCoords[i+1]);
+        // }
+        // this.hdc.lineTo(mCoords[0], mCoords[1]);
+        // this.hdc.strokeStyle = markerColor;
+        // ;
+        // this.hdc.stroke();
+        // this.hdc.lineWidth = this.hdc.lineWidth/2;
 
     @api getImage(){
         return this.template.querySelector('.mymap');
@@ -214,6 +265,10 @@ export default class CanvasArtist extends LightningElement {
         can.style.position = "absolute";
         can.style.left = x+'px';
         can.style.top = '0px';
+        if(this.floor.Height__c != undefined && this.floor.Height__c != 0){
+            w = this.floor.Width__c;
+            h = this.floor.Height__c;
+        }
         can.setAttribute('width', w+'px');
         can.setAttribute('height', h+'px');
         this.hdc = can.getContext('2d');
@@ -251,7 +306,7 @@ export default class CanvasArtist extends LightningElement {
                     }
                     strokeColor = '#DEB887';
                 }
-                this.drawPoly(coord.Coordinates,strokeColor,true,true,displayName,coord.CoordinatesCenter,coord.Width);
+                this.drawPoly(coord.Coordinates,strokeColor,true,true,displayName,coord.CoordinatesCenter,coord.Width,coord.Height);
             });
         }
 
@@ -269,7 +324,7 @@ export default class CanvasArtist extends LightningElement {
     }
 
     getInitials(name){
-        var initialz = (name.split(" ").map((n)=>n[0]).join(".")).toUpperCase();
+        var initialz = (name.replace(/[^a-zA-Z]/g,' ').replace(/ +/g,' ').split(" ").map((n)=>n[0]).join(".")).toUpperCase();
         return ''+initialz;
     }
 
@@ -287,12 +342,14 @@ export default class CanvasArtist extends LightningElement {
             else if(coord.Type == "Permanent"){
                 strokeColor = '#DEB887';
             }
-            this.drawPoly(coord.Coordinates,strokeColor,true,true,coord.Name,coord.CoordinatesCenter,coord.Width);
+            this.drawPoly(coord.Coordinates,strokeColor,true,true,coord.Name,coord.CoordinatesCenter,coord.Width,coord.Height);
         });
     }
 
-    drawPoly(coOrdStr,color,drawClosingLine,FillDrawing,Name,CoordsCenter,Width)
+    drawPoly(coOrdStr,color,drawClosingLine,FillDrawing,Name,CoordsCenter,Width,Height)
     {
+        // console.log('Width '+Width);
+        // console.log('Height '+Height);
         var mCoords;
         if(Array.isArray(coOrdStr)){
             mCoords = coOrdStr;
@@ -321,14 +378,25 @@ export default class CanvasArtist extends LightningElement {
              this.hdc.textBaseline = "middle";
              this.hdc.textAlign="center"; 
              var textWidth = this.hdc.measureText(Name).width;
-             var ratio = parseInt(Width*0.75/textWidth);
-             this.hdc.font = ratio+"px Arial";
+             var ratioW = parseInt(Width*0.75/textWidth);
+             this.hdc.font = ratioW+"px Arial";
+            //  console.log(ratioW);
+             var textHeight = this.hdc.measureText('M').width;
+             var ratioH = textHeight/Height;
+            //  console.log(ratioH);
+             if(ratioH > 1){
+                this.hdc.font = "1px Arial";
+                textHeight = this.hdc.measureText('M').width;
+                ratioH = parseInt(Height*0.75/textHeight)
+                this.hdc.font = ratioH+"px Arial";
+             }
              this.hdc.fillStyle = "#000000";
              let CoordsCenterSplit = CoordsCenter.split(',');
              this.hdc.fillText(Name,CoordsCenterSplit[0],CoordsCenterSplit[1]);
              this.hdc.fillStyle = color;
         }
     }
+
 
     // drawPolySticky(coOrdStr,color)
     // {

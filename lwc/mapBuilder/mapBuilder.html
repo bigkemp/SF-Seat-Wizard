@@ -2,7 +2,7 @@
     <div class="slds-grid">
         <div class="slds-col slds-size_1-of-5 slds-box" style="padding-bottom: 0;">
             <div class="slds-col slds-size_1-of-1 " style="background:white;">
-                    <button style="width: 100%;" onclick={saveNewSeats} class="slds-button slds-button_brand">Publish</button>
+                    <button style="width: 100%;" onclick={saveSeats} class="slds-button slds-button_brand">Publish</button>
                 <hr/>
             </div>
             <div class="slds-col slds-size_1-of-1 buildersidebar"  style="overflow-y: auto;">
@@ -37,19 +37,21 @@
                 </div>
                 <div class="slds-col slds-size_1-of-1 canvasHolder" style="overflow: auto;">
                     <template if:true={ChoseFloor}>
-                        <c-drawing-tool-menu onchosetype={handleChangeTool}>
+                        <c-drawing-tool-menu onchosetype={handleChangeTool} editiisactive={editDrawing}>
                             <div style="background-color:slategray;padding:2px;text-align: center; color: white;">Zoom</div>
                             <div style="padding-top:2px;padding-bottom:2px;">
                                 <lightning-button-icon-stateful size="small" icon-name="utility:add" onclick={zoomIN} alternative-text="Zoom In"  class="slds-m-around_xxx-small"></lightning-button-icon-stateful>
                                 <lightning-button-icon-stateful size="small" icon-name="utility:dash" onclick={zoomOUT} alternative-text="Zoom Out"  class="slds-m-around_xxx-small"></lightning-button-icon-stateful>
                             </div>
                             <hr style="margin-top:0;margin-bottom:0;"/>
-                            <div style="background-color:slategray;padding:2px;text-align: center; color: white;">Drawing</div>
-                            <div style="padding-top:2px;padding-bottom:2px;">
-                                <lightning-button-icon-stateful size="small" icon-name="utility:save" onclick={saveDrawing} alternative-text="Save Drawing"  class="slds-m-around_xxx-small"></lightning-button-icon-stateful>
-                                <lightning-button-icon-stateful size="small" icon-name="utility:redo" onclick={clearDrawing} alternative-text="Clear Drawing"  class="slds-m-around_xxx-small"></lightning-button-icon-stateful>
-                            </div>
-                            <hr style="margin-top:0;margin-bottom:0;"/>
+                            <template if:false={editDrawing}>
+                                <div style="background-color:slategray;padding:2px;text-align: center; color: white;">Drawing</div>
+                                <div style="padding-top:2px;padding-bottom:2px;">
+                                    <lightning-button-icon-stateful size="small" icon-name="utility:save" onclick={saveDrawing} alternative-text="Save Drawing"  class="slds-m-around_xxx-small"></lightning-button-icon-stateful>
+                                    <lightning-button-icon-stateful size="small" icon-name="utility:redo" onclick={clearDrawing} alternative-text="Clear Drawing"  class="slds-m-around_xxx-small"></lightning-button-icon-stateful>
+                                </div>
+                                <hr style="margin-top:0;margin-bottom:0;"/>
+                            </template>
                             <template if:true={editDrawing}>
                                 <div style="background-color:lightseagreen;padding:2px;text-align: center; color: white;">Edit</div>
                                 <div style="padding-top:2px;padding-bottom:2px;">
@@ -110,8 +112,11 @@
             ></lightning-checkbox-group>
             <br/>
             <template if:false={editIsOff}>
-                <lightning-button  variant="brand" label="Update Drawing" onclick={updateSelectedSeatDrawing} class="slds-m-left_x-small"></lightning-button>
-                *Update Drawing works only for rectangle drawings.
+                <div class="slds-box" style="display: inline-block;">
+                    <b>Redraw Seat:</b>
+                    <lightning-button  variant="brand" label="Rect" onclick={updateSelectedSeatDrawing} class="slds-m-left_x-small"></lightning-button>
+                    <lightning-button  variant="brand" label="Sticky" onclick={redrawSelectedSeatDrawing} class="slds-m-left_x-small"></lightning-button>
+                </div>
                 <br/><br/>
                 <lightning-button  variant="destructive" label="Delete Seat" onclick={deleteSelectedSeat} class="slds-m-left_x-small"></lightning-button>
             </template>

@@ -1,3 +1,6 @@
+import * as Sticky from './stickyLine';
+import { getNewCords,refreshDrawing } from './builder';
+
 var ctx;
     var rect = {
          x: 150,
@@ -12,11 +15,11 @@ var ctx;
     var imgctx;
     var wasInitialized = false;
     var canvasEle;
-
-    export function GetContext(canvasctx,coords){
+    var redrawing = false
+    export function GetContext(canvasctx,coords,isRedraw){
         ctx = canvasctx;
         if(!wasInitialized){
-            init(coords);
+            init(coords,isRedraw);
         }
     }
     
@@ -27,7 +30,15 @@ var ctx;
     export function saveAndEndEditMode(){
         wasInitialized = false;
         //ctx.editIsActive = false;
-        return convertRectformatToCoords();
+        let grabCoords;
+        if(redrawing){
+            Sticky.stopDrawing;
+            grabCoords= getNewCords();
+        }else{
+            grabCoords = convertRectformatToCoords();
+        }
+        refreshDrawing(true);
+        return grabCoords;
     }
     
 function convertRectformat(array){
@@ -66,17 +77,47 @@ function convertRectformatToCoords(){
     return arr;
 }
 
-function init(coords) {
+function drawPoly(coOrdStr){
+    hdc.clearRect(0, 0, canvasEle.width, canvasEle.height);
+        var mCoords = coOrdStr.split(',');
+        var i, n;
+        n = mCoords.length;
+        hdc.beginPath();
+        hdc.moveTo(mCoords[0], mCoords[1]);
+        for (i=2; i<n; i+=2)
+        {
+            hdc.lineTo(mCoords[i], mCoords[i+1]);
+        }
+        hdc.save();
+        hdc.setLineDash([5, 3]);
+        hdc.lineTo(mCoords[0], mCoords[1]);
+        hdc.strokeStyle = 'black';
+        hdc.lineWidth = hdc.lineWidth*2;
+        hdc.stroke();
+        hdc.restore();
+}
+
+function init(coords,isRedraw) {
     ctx.editIsActive = true;
+    redrawing = isRedraw;
     canvasEle = ctx.byClass('myCanvas');
     hdc = canvasEle.getContext('2d');
-    convertRectformat(coords);
     imgctx = ctx.byClass('mymap');
-    imgctx.addEventListener('mousedown', mouseDownResize, false);
-    imgctx.addEventListener('mouseup', mouseUpResize, false);
-    imgctx.addEventListener('mousemove', mouseMoveResize, false);
+    imgctx.removeEventListener("mousedown", mouseDownResize)
+    imgctx.removeEventListener("mouseup", mouseUpResize);
+    imgctx.removeEventListener("mousemove", mouseMoveResize);
+    if(!isRedraw){
+        convertRectformat(coords);
+        imgctx.addEventListener('mousedown', mouseDownResize, false);
+        imgctx.addEventListener('mouseup', mouseUpResize, false);
+        imgctx.addEventListener('mousemove', mouseMoveResize, false);
+        drawRect();
+    }else{
+        drawPoly(coords);
+        ctx.isSticky = true;
+        Sticky.GetContext(ctx);
+    }
     wasInitialized = true;
-    draw();
 }
 
 function point(x, y) {
@@ -106,14 +147,14 @@ function mouseDownResize(e) {
     if(!ctx.isResize) { imgctx.removeEventListener("mousedown", mouseDownResize);return} 
 
     if (currentHandle) drag = true;
-    draw();
+    drawRect();
 }
 
 function mouseUpResize() {
     if(!ctx.isResize) { imgctx.removeEventListener("mouseup", mouseUpResize);return} 
     drag = false;
     currentHandle = false;
-    draw();
+    drawRect();
 }
 
 function mouseMoveResize(e) {
@@ -167,11 +208,11 @@ function mouseMoveResize(e) {
                 break;
         }
     }
-    if (drag || currentHandle != previousHandle) draw();
+    if (drag || currentHandle != previousHandle) drawRect();
 
 }
 
-function draw() {
+function drawRect() {
     hdc.clearRect(0, 0, canvasEle.width, canvasEle.height);
     hdc.fillStyle = 'black';
     hdc.fillRect(rect.x, rect.y, rect.w, rect.h);

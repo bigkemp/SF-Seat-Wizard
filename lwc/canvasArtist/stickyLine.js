@@ -1,4 +1,4 @@
-import { updateNewCoords,refreshDrawing,drawNewCords,getNewCords } from './builder';
+import { updateNewCoords,saveDrawing,refreshDrawing,drawNewCords,getNewCords,ClearSavedDrawings,overrideNewCoords } from './builder';
 
 var canvasEle;
 var context;
@@ -40,7 +40,19 @@ export function resetInitialized(){
 function ctrlSListener(event){
     if(!ctx.isSticky) { window.removeEventListener("keydown", ctrlSListener);return} 
     if (event.ctrlKey && event.key === 's') {
-        stopDrawing()
+        if(ctx.editIsActive){
+            refreshDrawing(false); // removing the drawline after Escape
+            // drawNewCords()
+            let alignedCords = getNewCords().slice(0, -2);
+            // let alignedCords = currentDrawingCords;
+            ctx.drawPoly(alignedCords,'black',true,false,undefined,undefined,undefined);
+            startPosition = {x: 0, y: 0};
+            overrideNewCoords(alignedCords);
+            // saveDrawing(getNewCords(),false);
+            // ClearSavedDrawings();
+        }
+        stopDrawing();
+
     }
 }
 

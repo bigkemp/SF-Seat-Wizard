@@ -1,11 +1,13 @@
 <template>
     <div class="slds-box myHeader" style="background:rgb(236, 236, 236);position:absolute;padding: 1px;z-index:1;">
-        <div style="background-color:slategray;padding:2px;text-align: center; color: white;">Tools</div>
-        <div style="padding:2px">
-            <lightning-button-icon-stateful size="small" icon-name="utility:trending"  data-button-type="Sticky" selected={choseSticky} onclick={handleButtonClick} alternative-text="Sticky Tool"  class="slds-m-around_xxx-small"></lightning-button-icon-stateful>
-            <lightning-button-icon-stateful size="small" icon-name="utility:new_direct_message"  data-button-type="Rectangle" selected={choseRectangle} onclick={handleButtonClick} alternative-text="Rectangle Tool"  class="slds-m-around_xxx-small"></lightning-button-icon-stateful>
-        </div>
-        <hr style="margin-top:0;margin-bottom:0;"/>
+        <template if:false={editiisactive}>
+            <div style="background-color:slategray;padding:2px;text-align: center; color: white;">Tools</div>
+            <div style="padding:2px">
+                <lightning-button-icon-stateful size="small" icon-name="utility:trending"  data-button-type="Sticky" selected={choseSticky} onclick={handleButtonClick} alternative-text="Sticky Tool"  class="slds-m-around_xxx-small"></lightning-button-icon-stateful>
+                <lightning-button-icon-stateful size="small" icon-name="utility:new_direct_message"  data-button-type="Rectangle" selected={choseRectangle} onclick={handleButtonClick} alternative-text="Rectangle Tool"  class="slds-m-around_xxx-small"></lightning-button-icon-stateful>
+            </div>
+            <hr style="margin-top:0;margin-bottom:0;"/>
+        </template>
         <div style="padding-top:2px;padding-bottom:2px;">
             <slot></slot>
         </div>

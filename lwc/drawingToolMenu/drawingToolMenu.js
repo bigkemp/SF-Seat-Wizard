@@ -1,9 +1,10 @@
-import { LightningElement } from 'lwc';
+import { LightningElement,api } from 'lwc';
 
 export default class DrawingToolMenu extends LightningElement {
     choseSticky = false;
     choseRectangle = false;
-    
+    @api editiisactive = false;
+
     handleButtonClick(event){
         const toolType = event.target.dataset.buttonType;
         this.setSelected(toolType);

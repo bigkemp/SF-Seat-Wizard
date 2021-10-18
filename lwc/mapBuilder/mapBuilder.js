@@ -1,8 +1,9 @@
 import { LightningElement,track,api,wire } from 'lwc';
 import getAvailableSeats from "@salesforce/apex/reservationWiz.getAvailableSeats";
-import saveNewSeats2 from "@salesforce/apex/reservationWiz.saveNewSeats";
+import saveNewSeats from "@salesforce/apex/reservationWiz.saveNewSeats";
 import updateSeatCords from '@salesforce/apex/reservationWiz.updateSeatCords';
 import getFloors from '@salesforce/apex/reservationWiz.getFloors';
+import updateFloor from '@salesforce/apex/reservationWiz.updateFloors';
 import deleteSeat from '@salesforce/apex/reservationWiz.deleteSeat';
 import updateSeat from '@salesforce/apex/reservationWiz.updateSeatByCords';
 import getSeatAttributes from '@salesforce/apex/reservationWiz.getSeatAttributes';
@@ -112,13 +113,25 @@ export default class MapBuilder extends LightningElement {
         elm.changeTool(event.detail);
     }
 
-    async saveNewSeats(){
+    needToUpdateFloorSize(){
+        let elm = this.getCanvas();
+        let imgsize = elm.getImage();
+        if(imgsize.clientHeight != this.floor.Height__c){
+             updateFloor({floor: this.floor.Id, newHeight:imgsize.clientHeight,newWidth:imgsize.clientWidth});
+        }else{
+            return;
+        }
+    }
+    
+
+    async saveSeats(){
         if(this.savedDrawings.length == 0){
             this.showToast("Warning","Please first save a drawing of a seat.","warning");
             return;
         }
         this.startLoading();
-        var res =  await saveNewSeats2({Json:JSON.stringify(this.savedDrawings),floorMap:this.floor.Id});
+        this.needToUpdateFloorSize();
+        var res =  await saveNewSeats({Json:JSON.stringify(this.savedDrawings),floorMap:this.floor.Id});
         await this.getCoordsFromServer();
         let elm = this.getCanvas();
         this.savedDrawings = elm.ClearSavedDrawings();
@@ -252,7 +265,14 @@ export default class MapBuilder extends LightningElement {
 
     updateSelectedSeatDrawing(){
         let elm = this.getCanvas();
-        elm.startEdit(this.SelectedSeat.Coordinates);
+        elm.startEdit(this.SelectedSeat.Coordinates,false);
+        this.editDrawing = true;
+        this.closeModal();
+    }
+
+    redrawSelectedSeatDrawing(){
+        let elm = this.getCanvas();
+        elm.startEdit(this.SelectedSeat.Coordinates,true);
         this.editDrawing = true;
         this.closeModal();
     }
@@ -260,6 +280,7 @@ export default class MapBuilder extends LightningElement {
     saveEditChanges(){
         let elm = this.getCanvas();
         var newCoords = elm.saveAndEndEditMode();
+        // elm.resetToolTypes();
         this.updateResizeSeat(newCoords)
     }
 

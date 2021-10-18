@@ -28,7 +28,7 @@ function initCBuilder(){
         if (event.ctrlKey && event.key === 'z') {
             newCoords.pop();
             newCoords.pop();
-            refresh();
+            refreshDrawing(false);
             if(newCoords.length === 0){
                 previousY = undefined;
                 previousX = undefined;
@@ -42,7 +42,9 @@ function initCBuilder(){
         }
 
         if (event.ctrlKey && event.key === 's') {
-            ctx.invokeSave()
+            if(!ctx.editIsActive){
+                ctx.invokeSave()
+            }
         }
     });
 }
@@ -58,7 +60,7 @@ export function saveDrawing(currentSavedDrawings,isUpdate){
             // let alignedCords = currentDrawingCords;
             savedCoords = currentSavedDrawings;
             savedCoords.push({Name: "",Coord:alignedCords});
-            ctx.drawPoly(alignedCords,'darkblue',true,false,undefined,undefined);
+            ctx.drawPoly(alignedCords,'darkblue',true,false,undefined,undefined,undefined);
         }else{
             console.log('err')
             ctx.showToast('Error','Insufficient coordinates to create a contour','error')
@@ -80,22 +82,26 @@ export function deleteDrawing(coord){
         }
     });
     savedCoords = newSavedCords;
-    refresh();
+    refreshDrawing(false);
 }
 
-function refresh(){
-    cleanCanvas();
-    ctx.reDrawPublishedSeats();
-    reDrawSavedSeats();
-}
+// function refresh(){
+//     cleanCanvas();
+//     if(!ctx.editIsActive){
+//         ctx.reDrawPublishedSeats();
+//         reDrawSavedSeats();
+//     }
+// }
 
 export function refreshDrawing(clearNewCoords){
     if(clearNewCoords){
         newCoords = [];
     }
     cleanCanvas();
-    ctx.reDrawPublishedSeats();
-    reDrawSavedSeats();
+    if(!ctx.editIsActive){
+        ctx.reDrawPublishedSeats();
+        reDrawSavedSeats();
+    }
 }
 
 function drawLinesAfterCtrlZ(mCoords,color)
@@ -122,14 +128,14 @@ function cleanCanvas()
 
 function reDrawSavedSeats(){
     savedCoords.forEach(coord => {
-        ctx.drawPoly(coord.Coord+'','darkblue',true,false,undefined,undefined);
+        ctx.drawPoly(coord.Coord+'','darkblue',true,false,undefined,undefined,undefined);
     });
 }
 
 
 
 export function drawNewCords(){
-    ctx.drawPoly(newCoords+'','darkblue',false,false,undefined,undefined);
+    ctx.drawPoly(newCoords+'','darkblue',false,false,undefined,undefined,undefined);
 }
 
 export function getNewCords(){
@@ -139,4 +145,8 @@ export function getNewCords(){
 export function updateNewCoords(pointX, pointY){
     newCoords.push(parseInt(pointX));
     newCoords.push(parseInt(pointY));
+}
+
+export function overrideNewCoords(overrideCoords){
+    newCoords = overrideCoords;
 }
